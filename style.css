@@ -1455,4 +1455,15 @@ footer {
   }
 
   nav.links a.active::after { display: none; }
+
+  /* the fixed VEX code texture sits directly behind any text that
+     isn't on its own opaque card/section background (headings,
+     eyebrows, body copy, tab labels) — a white halo keeps those
+     letterforms readable without changing anything on solid
+     backgrounds, since white-on-white is invisible there */
+  h1, h2, h3, p, .eyebrow, .tab-btn, #panel-count, .pill {
+    text-shadow:
+      0 0 1px #fff, 0 0 2px #fff, 0 0 7px rgba(255, 255, 255, 0.9),
+      1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
+  }
 }
