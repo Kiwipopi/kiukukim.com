@@ -1466,4 +1466,13 @@ footer {
       0 0 1px #fff, 0 0 2px #fff, 0 0 7px rgba(255, 255, 255, 0.9),
       1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
   }
+
+  /* fainter code texture on mobile, where it sits closer to the
+     content and has less room to breathe than on desktop */
+  .code-texture { color: rgba(0, 0, 0, 0.08); }
+  .code-texture .tok-num { color: rgba(0, 0, 0, 0.06); }
+  .code-texture .tok-kw { color: rgba(0, 0, 0, 0.17); }
+  .code-texture .tok-attr { color: rgba(0, 0, 0, 0.15); }
+  .code-texture .tok-str { color: rgba(0, 0, 0, 0.11); }
+  .code-texture .tok-comment { color: rgba(0, 0, 0, 0.07); }
 }
