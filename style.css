@@ -1047,28 +1047,29 @@ section { padding: 110px 0; }
 
 .tabs {
   display: flex;
-  gap: 10px;
-  margin-bottom: 32px;
-  flex-wrap: wrap;
-  position: sticky;
-  top: var(--header-h);
-  z-index: 5;
-  padding: 14px 0;
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 4px 0;
 }
+
+.tabs::-webkit-scrollbar { display: none; }
 
 .tab-btn {
   font-family: var(--font);
-  padding: 10px 22px;
+  padding: 8px 18px;
   border-radius: 999px;
   border: 1px solid var(--card-border);
   background: transparent;
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.2s ease;
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .tab-btn:hover { color: var(--text); border-color: rgba(0, 0, 0, 0.3); }
