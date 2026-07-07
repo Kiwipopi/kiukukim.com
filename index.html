@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WOOK — Media Artist</title>
+<meta name="description" content="Wook — Houdini 파티클 시뮬레이션 기반 미디어 아티스트 포트폴리오" />
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body class="home-page">
+<div class="intro-splash" aria-hidden="true">
+  <canvas id="intro-canvas"></canvas>
+  <div class="intro-orbit" aria-hidden="true">
+    <svg class="orbit-ring orbit-ring--a" viewBox="0 0 600 600">
+      <circle cx="300" cy="300" r="280" />
+    </svg>
+    <svg class="orbit-ring orbit-ring--b" viewBox="0 0 600 600">
+      <circle cx="300" cy="300" r="230" />
+    </svg>
+  </div>
+  <div class="intro-mark">kiukukim</div>
+  <p class="intro-tagline">Freedom blooming in ever-shifting moments</p>
+</div>
+<canvas id="flow-bg"></canvas>
+<canvas id="particle-bg"></canvas>
+
+<div class="page">
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="logo" href="index.html">WOO<span>K</span></a>
+      <nav class="links">
+        <a href="index.html" class="active">Home</a>
+        <a href="works.html">Works</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <a class="nav-ig" href="https://www.instagram.com/kiukukim" target="_blank" rel="noopener">@kiukukim</a>
+    </div>
+  </header>
+
+  <section class="kiukukim-hero">
+    <div class="hero-pin">
+      <div class="hero-orbit" aria-hidden="true">
+        <svg class="orbit-ring orbit-ring--a" viewBox="0 0 600 600">
+          <circle cx="300" cy="300" r="280" />
+        </svg>
+        <svg class="orbit-ring orbit-ring--b" viewBox="0 0 600 600">
+          <circle cx="300" cy="300" r="230" />
+        </svg>
+      </div>
+      <div class="hero-stage">
+        <p class="intro-phrase">
+          <span class="phrase-stack">
+            <span class="phrase-fill">Freedom blooming in ever-shifting moments</span>
+            <span class="phrase-outline" aria-hidden="true">Freedom blooming in ever-shifting moments</span>
+          </span>
+        </p>
+        <h1 class="kiukukim-mark">kiukukim</h1>
+      </div>
+    </div>
+  </section>
+
+  <section class="interlude" data-scene="01">
+    <div class="scene-wipe" aria-hidden="true"></div>
+    <div class="hero-orbit" aria-hidden="true">
+      <svg class="orbit-ring orbit-ring--a" viewBox="0 0 600 600">
+        <circle cx="300" cy="300" r="280" />
+      </svg>
+      <svg class="orbit-ring orbit-ring--b" viewBox="0 0 600 600">
+        <circle cx="300" cy="300" r="230" />
+      </svg>
+    </div>
+    <p class="interlude-text">Movement, particles, light, and flow —<br>constantly changing.</p>
+  </section>
+
+  <section class="interlude" data-scene="02">
+    <div class="scene-wipe" aria-hidden="true"></div>
+    <div class="hero-orbit" aria-hidden="true">
+      <svg class="orbit-ring orbit-ring--a" viewBox="0 0 600 600">
+        <circle cx="300" cy="300" r="280" />
+      </svg>
+      <svg class="orbit-ring orbit-ring--b" viewBox="0 0 600 600">
+        <circle cx="300" cy="300" r="230" />
+      </svg>
+    </div>
+    <p class="interlude-text">Scattering, gathering,<br>drifting apart, blending together.</p>
+  </section>
+
+  <section class="interlude" data-scene="03">
+    <div class="scene-wipe" aria-hidden="true"></div>
+    <div class="hero-orbit" aria-hidden="true">
+      <svg class="orbit-ring orbit-ring--a" viewBox="0 0 600 600">
+        <circle cx="300" cy="300" r="280" />
+      </svg>
+      <svg class="orbit-ring orbit-ring--b" viewBox="0 0 600 600">
+        <circle cx="300" cy="300" r="230" />
+      </svg>
+    </div>
+    <p class="interlude-text">Freedom, depth, and immersion<br>within ever-changing images.</p>
+  </section>
+
+  <section class="interlude stat-scene" data-scene="04">
+    <div class="hero-orbit" aria-hidden="true">
+      <svg class="orbit-ring orbit-ring--a" viewBox="0 0 600 600">
+        <circle cx="300" cy="300" r="280" />
+      </svg>
+      <svg class="orbit-ring orbit-ring--b" viewBox="0 0 600 600">
+        <circle cx="300" cy="300" r="230" />
+      </svg>
+    </div>
+    <div class="metric-row">
+      <div class="metric">
+        <div class="metric-num" data-count-to="27">0</div>
+        <div class="metric-label">Works</div>
+      </div>
+      <div class="metric">
+        <div class="metric-num" data-count-to="3">0</div>
+        <div class="metric-label">Exhibitions</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="interlude interlude--cta" data-scene="05">
+    <div class="scene-wipe" aria-hidden="true"></div>
+    <div class="hero-orbit" aria-hidden="true">
+      <svg class="orbit-ring orbit-ring--a" viewBox="0 0 600 600">
+        <circle cx="300" cy="300" r="280" />
+      </svg>
+      <svg class="orbit-ring orbit-ring--b" viewBox="0 0 600 600">
+        <circle cx="300" cy="300" r="230" />
+      </svg>
+    </div>
+    <a class="interlude-cta" href="works.html">
+      <span class="interlude-cta-inner">
+        View All Works
+        <span class="interlude-cta-count" data-count-to="27">0</span>
+        →
+      </span>
+    </a>
+  </section>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
