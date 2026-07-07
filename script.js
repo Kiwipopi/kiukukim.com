@@ -1170,3 +1170,27 @@
   );
   scenes.forEach(function (s) { io.observe(s); });
 })();
+
+// Header height tracking — the nav links are always visible (styled
+// as pill tabs on mobile, a plain row on desktop), and wrap onto a
+// second line once the header gets too narrow to fit them inline.
+// That makes the header's real height vary by viewport, so it's
+// measured here and published as --header-h for every sticky offset
+// (hero pin, work tabs) that needs to sit flush beneath it, instead
+// of every one of them guessing a fixed pixel value.
+(function () {
+  var header = document.querySelector('header.nav');
+  if (!header) return;
+
+  function update() {
+    document.documentElement.style.setProperty('--header-h', header.offsetHeight + 'px');
+  }
+
+  update();
+  window.addEventListener('resize', update);
+  // Pretendard loads async and can shift text metrics slightly once
+  // it's ready, which can change header height by a few px
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(update);
+  }
+})();

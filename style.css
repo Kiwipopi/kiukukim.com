@@ -12,6 +12,11 @@
   --gradient: linear-gradient(120deg, #000000, #3a3a3a 60%, #000000);
   --on-accent: #ffffff;
   --font: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+  /* actual rendered height of header.nav — measured by JS (varies:
+     one row on desktop, two rows on mobile once the nav pills wrap
+     below the logo) so every sticky offset that depends on the header
+     can just reference this instead of a hardcoded guess */
+  --header-h: 58px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -440,6 +445,7 @@ nav.links a.active::after {
   transform: translateY(-1px);
 }
 
+
 /* ---------- Playful home intro — a short phrase greets you first,
    grows large as you scroll, then bursts apart into particles (JS)
    while the kiukukim wordmark fades in behind it. The hero is a tall
@@ -453,8 +459,8 @@ nav.links a.active::after {
 
 .hero-pin {
   position: sticky;
-  top: 58px;
-  height: calc(100vh - 58px);
+  top: var(--header-h);
+  height: calc(100vh - var(--header-h));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1045,7 +1051,7 @@ section { padding: 110px 0; }
   margin-bottom: 32px;
   flex-wrap: wrap;
   position: sticky;
-  top: 58px;
+  top: var(--header-h);
   z-index: 5;
   padding: 14px 0;
   background: rgba(255, 255, 255, 0.82);
@@ -1409,5 +1415,43 @@ footer {
   .about-grid { grid-template-columns: 1fr; }
   .avatar-wrap { max-width: 220px; margin: 0 auto; }
   .stats { grid-template-columns: 1fr; }
-  nav.links { display: none; }
+
+  /* the nav row wraps onto a second line: logo + IG link stay on top,
+     the link list drops below as its own full-width row of pill
+     buttons — always visible, no tap-to-reveal menu, styled the same
+     way as the category tabs on the works page for a consistent feel */
+  .nav-inner {
+    flex-wrap: wrap;
+    row-gap: 12px;
+  }
+
+  nav.links {
+    order: 3;
+    flex-basis: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  nav.links::-webkit-scrollbar { display: none; }
+
+  nav.links a {
+    flex: 0 0 auto;
+    padding: 9px 18px;
+    border-radius: 999px;
+    border: 1px solid var(--card-border);
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+
+  nav.links a.active {
+    color: var(--on-accent);
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  nav.links a.active::after { display: none; }
 }
