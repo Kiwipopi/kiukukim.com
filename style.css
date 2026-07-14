@@ -1122,12 +1122,15 @@ section { padding: 110px 0; }
   margin: 0 auto;
 }
 
+/* portrait cards stay three to a row even on phones, rather than
+   dropping to 2 or 1 wide — just with a tighter gap so they still
+   have room to breathe */
 @media (max-width: 620px) {
-  .grid { grid-template-columns: repeat(2, 1fr); }
+  .grid { gap: 10px; }
 }
 
 @media (max-width: 440px) {
-  .grid { grid-template-columns: 1fr; }
+  .grid { gap: 6px; }
   .card.wide .thumb { max-width: none; }
 }
 
