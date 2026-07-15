@@ -1095,6 +1095,19 @@ section { padding: 110px 0; }
   letter-spacing: -0.01em;
 }
 
+.exhibition-group-note {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  max-width: 640px;
+}
+
+.exhibition-group-note a {
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 #panel-exhibition .card.wide .thumb {
   max-width: 860px;
 }
