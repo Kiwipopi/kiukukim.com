@@ -1185,7 +1185,8 @@ section { padding: 110px 0; }
   aspect-ratio: 16 / 9;
 }
 
-.thumb.landscape video {
+.thumb.landscape video,
+.thumb.landscape img {
   object-fit: contain;
   background: #000;
 }
