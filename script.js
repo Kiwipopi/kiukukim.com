@@ -1316,6 +1316,20 @@
   });
 })();
 
+// Scroll cue — the fixed "Scroll" hint in the corner bows out as soon
+// as the visitor actually starts scrolling, returning at the very top.
+(function () {
+  var hint = document.querySelector('.scroll-hint');
+  if (!hint) return;
+
+  function update() {
+    hint.classList.toggle('scroll-hint--hidden', window.scrollY > 120);
+  }
+
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+})();
+
 // Footer meta bar — live Seoul clock and smooth back-to-top.
 (function () {
   function setup() {

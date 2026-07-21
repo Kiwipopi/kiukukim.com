@@ -1557,6 +1557,111 @@ footer {
   transform: translateY(0);
 }
 
+/* floating 3D work cubes — thumbnails wrapped around slowly tumbling
+   cubes drifting beside the works CTA, nirnor-style */
+.float-cube {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  perspective: 700px;
+  animation: cube-bob 7s ease-in-out infinite alternate;
+}
+
+.float-cube--a {
+  left: 12%;
+  top: 22%;
+  --cube: 130px;
+}
+
+.float-cube--b {
+  right: 12%;
+  bottom: 18%;
+  --cube: 92px;
+  animation-duration: 9s;
+  animation-delay: -3s;
+}
+
+.cube {
+  width: var(--cube);
+  height: var(--cube);
+  transform-style: preserve-3d;
+  animation: cube-tumble 30s linear infinite;
+}
+
+.float-cube--b .cube {
+  animation-duration: 38s;
+  animation-direction: reverse;
+}
+
+.cube-face {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  backface-visibility: hidden;
+}
+
+.cube-face--front  { transform: rotateY(0deg)   translateZ(calc(var(--cube) / 2)); }
+.cube-face--back   { transform: rotateY(180deg) translateZ(calc(var(--cube) / 2)); }
+.cube-face--right  { transform: rotateY(90deg)  translateZ(calc(var(--cube) / 2)); }
+.cube-face--left   { transform: rotateY(-90deg) translateZ(calc(var(--cube) / 2)); }
+.cube-face--top    { transform: rotateX(90deg)  translateZ(calc(var(--cube) / 2)); }
+.cube-face--bottom { transform: rotateX(-90deg) translateZ(calc(var(--cube) / 2)); }
+
+@keyframes cube-tumble {
+  from { transform: rotateX(0deg) rotateY(0deg); }
+  to { transform: rotateX(360deg) rotateY(720deg); }
+}
+
+@keyframes cube-bob {
+  from { transform: translateY(-12px); }
+  to { transform: translateY(14px); }
+}
+
+/* quiet fixed scroll cue in the corner — a small vertical label with a
+   line that keeps drawing itself downward; fades once scrolling starts */
+.scroll-hint {
+  position: fixed;
+  right: 26px;
+  bottom: 22px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+.scroll-hint span {
+  writing-mode: vertical-rl;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.scroll-hint i {
+  width: 1px;
+  height: 42px;
+  background: var(--muted);
+  transform-origin: top center;
+  animation: hint-draw 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@keyframes hint-draw {
+  0% { transform: scaleY(0); transform-origin: top center; }
+  45% { transform: scaleY(1); transform-origin: top center; }
+  55% { transform: scaleY(1); transform-origin: bottom center; }
+  100% { transform: scaleY(0); transform-origin: bottom center; }
+}
+
+.scroll-hint--hidden {
+  opacity: 0;
+}
+
 /* ---------- Big CTA footer — oversized closing invitation with a
    meta bar (copyright · live Seoul clock · back-to-top) below it ---------- */
 
@@ -1636,9 +1741,12 @@ footer {
 
 @media (max-width: 720px) {
   /* hero corners are too tight on phones for the metadata columns
-     and the vertical side captions */
+     and the vertical side captions; the floating cubes and scroll cue
+     crowd the small screen too */
   .hero-meta { display: none; }
   .hero-side { display: none; }
+  .float-cube { display: none; }
+  .scroll-hint { display: none; }
 
   .about-grid { grid-template-columns: 1fr; }
   .avatar-wrap { max-width: 220px; margin: 0 auto; }
