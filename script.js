@@ -849,7 +849,7 @@
   if (window.matchMedia('(hover: none), (pointer: coarse)').matches) return;
 
   function setup() {
-    var targets = document.querySelectorAll('nav.links a, .interlude-cta-inner');
+    var targets = document.querySelectorAll('nav.links a, .interlude-cta-inner, .footer-cta-link');
     var strength = 0.35;
 
     targets.forEach(function (el) {
@@ -1192,5 +1192,35 @@
   // it's ready, which can change header height by a few px
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(update);
+  }
+})();
+
+// Footer meta bar — live Seoul clock and smooth back-to-top.
+(function () {
+  function setup() {
+    var clocks = document.querySelectorAll('[data-local-time]');
+    if (clocks.length) {
+      var tick = function () {
+        var t = new Date().toLocaleTimeString('en-GB', {
+          timeZone: 'Asia/Seoul',
+          hour12: false,
+        });
+        clocks.forEach(function (el) { el.textContent = t + ' KST'; });
+      };
+      tick();
+      setInterval(tick, 1000);
+    }
+
+    document.querySelectorAll('.to-top').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setup);
+  } else {
+    setup();
   }
 })();

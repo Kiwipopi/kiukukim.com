@@ -455,6 +455,9 @@ nav.links a.active::after {
 .kiukukim-hero {
   position: relative;
   height: 240vh;
+  /* no section padding: the pin must start flush under the header so
+     the hero-meta columns at its bottom edge are visible on first paint */
+  padding: 0;
 }
 
 .hero-pin {
@@ -1427,9 +1430,141 @@ footer {
   font-size: 0.82rem;
 }
 
+/* ---------- Awwwards-style flourishes ---------- */
+
+::selection {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* editorial metadata columns pinned to the bottom of the home hero —
+   small-caps labels over short values, each column opened by a thin
+   rule, the way award-site heroes anchor their corners with facts */
+.hero-meta {
+  position: absolute;
+  left: 28px;
+  right: 28px;
+  bottom: 18px;
+  z-index: 1;
+  display: flex;
+  gap: clamp(24px, 5vw, 56px);
+}
+
+.hero-meta > div {
+  flex: 0 1 240px;
+  border-top: 1px solid rgba(0, 0, 0, 0.28);
+  padding-top: 10px;
+}
+
+.hero-meta .k {
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+
+.hero-meta .v {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+
+/* work-card media zooms gently inside its clipped frame on hover */
+.card .thumb img,
+.card .thumb video {
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card:hover .thumb img,
+.card:hover .thumb video {
+  transform: scale(1.045);
+}
+
+/* ---------- Big CTA footer — oversized closing invitation with a
+   meta bar (copyright · live Seoul clock · back-to-top) below it ---------- */
+
+.site-footer {
+  position: relative;
+  z-index: 1;
+}
+
+.footer-cta {
+  border-top: 1px solid var(--card-border);
+  padding: 96px 0 100px;
+}
+
+.footer-cta .eyebrow {
+  margin-bottom: 16px;
+}
+
+.footer-cta-link {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(12px, 2.5vw, 26px);
+  font-family: var(--font);
+  font-weight: 800;
+  font-size: clamp(2rem, 7vw, 4.6rem);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--text);
+}
+
+.footer-cta-link .cta-arrow {
+  display: inline-block;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.footer-cta-link:hover .cta-arrow {
+  transform: translateX(14px);
+}
+
+.footer-meta {
+  border-top: 1px solid var(--card-border);
+  padding: 20px 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.footer-meta-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.footer-clock {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+.to-top {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-family: var(--font);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.to-top:hover {
+  color: var(--text);
+}
+
 /* ---------- Responsive ---------- */
 
 @media (max-width: 720px) {
+  /* hero corners are too tight on phones for the metadata columns */
+  .hero-meta { display: none; }
+
   .about-grid { grid-template-columns: 1fr; }
   .avatar-wrap { max-width: 220px; margin: 0 auto; }
   .stats { grid-template-columns: 1fr; }
