@@ -418,7 +418,9 @@ nav.links a.active {
   color: var(--text);
 }
 
-nav.links a.active::after {
+/* underline draws in from the left on hover, retreats to the right on
+   leave (transform-origin swap) — the active link keeps its line */
+nav.links a::after {
   content: "";
   position: absolute;
   left: 0;
@@ -427,6 +429,18 @@ nav.links a.active::after {
   height: 2px;
   background: var(--gradient);
   border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+nav.links a:hover::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+nav.links a.active::after {
+  transform: scaleX(1);
 }
 
 .nav-ig {
@@ -1331,12 +1345,21 @@ section { padding: 110px 0; }
   align-items: start;
 }
 
+/* slowly-morphing organic blob mask instead of a static rounded box */
 .avatar-wrap {
-  border-radius: 20px;
+  border-radius: 58% 42% 55% 45% / 52% 58% 42% 48%;
   overflow: hidden;
   border: 1px solid var(--card-border);
   aspect-ratio: 1 / 1;
   background: #111;
+  animation: blob-morph 14s ease-in-out infinite alternate;
+}
+
+@keyframes blob-morph {
+  0% { border-radius: 58% 42% 55% 45% / 52% 58% 42% 48%; }
+  33% { border-radius: 45% 55% 48% 52% / 58% 44% 56% 42%; }
+  66% { border-radius: 52% 48% 60% 40% / 45% 55% 45% 55%; }
+  100% { border-radius: 48% 52% 42% 58% / 55% 45% 58% 42%; }
 }
 
 .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
@@ -1484,6 +1507,56 @@ footer {
   transform: scale(1.045);
 }
 
+/* vertical (tategaki) side captions flanking the home hero — a nod to
+   Japanese editorial layouts; right one sits clear of the scene index */
+.hero-side {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+  writing-mode: vertical-rl;
+  font-size: 0.72rem;
+  letter-spacing: 0.38em;
+  color: var(--muted);
+  pointer-events: none;
+  user-select: none;
+}
+
+.hero-side--left { left: 26px; }
+.hero-side--right { right: 64px; }
+
+/* preloader percentage in the intro splash's corner, counting up while
+   the particles assemble — hits 100 as the wordmark snaps in */
+.intro-counter {
+  position: absolute;
+  left: 28px;
+  bottom: 24px;
+  z-index: 1;
+  font-family: var(--font);
+  font-weight: 800;
+  font-size: 0.9rem;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* char-staggered heading reveal — headings split into letters (JS)
+   that rise out of the heading's own clipped line box one by one once
+   an ancestor gets .in-view */
+.ch-split { overflow: hidden; }
+
+.ch-split .ch {
+  display: inline-block;
+  transform: translateY(115%);
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--ci, 0) * 45ms);
+}
+
+.in-view .ch-split .ch,
+.ch-split.in-view .ch {
+  transform: translateY(0);
+}
+
 /* ---------- Big CTA footer — oversized closing invitation with a
    meta bar (copyright · live Seoul clock · back-to-top) below it ---------- */
 
@@ -1562,8 +1635,10 @@ footer {
 /* ---------- Responsive ---------- */
 
 @media (max-width: 720px) {
-  /* hero corners are too tight on phones for the metadata columns */
+  /* hero corners are too tight on phones for the metadata columns
+     and the vertical side captions */
   .hero-meta { display: none; }
+  .hero-side { display: none; }
 
   .about-grid { grid-template-columns: 1fr; }
   .avatar-wrap { max-width: 220px; margin: 0 auto; }
@@ -1606,7 +1681,7 @@ footer {
     border-color: var(--accent);
   }
 
-  nav.links a.active::after { display: none; }
+  nav.links a::after { display: none; }
 
   /* the fixed VEX code texture sits directly behind any text that
      isn't on its own opaque card/section background (headings,

@@ -10,6 +10,7 @@
 
   var canvas = splash.querySelector('canvas');
   var ctx = canvas && canvas.getContext('2d');
+  var counter = splash.querySelector('.intro-counter');
   document.documentElement.classList.add('intro-lock');
 
   function finishInstantly() {
@@ -97,6 +98,15 @@
     if (!ringsShown) {
       ringsShown = true;
       splash.classList.add('intro-rings-visible');
+    }
+
+    // preloader-style percentage — reaches 100 right as the crisp
+    // wordmark appears (end of the converge phase)
+    if (counter) {
+      var pct = Math.floor(clamp01(elapsed / (PRELUDE_MS + CONVERGE_MS)) * 100);
+      var s = String(pct);
+      while (s.length < 3) s = '0' + s;
+      counter.textContent = s + '%';
     }
 
     if (elapsed < PRELUDE_MS) {
@@ -1193,6 +1203,117 @@
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(update);
   }
+})();
+
+// Char-staggered headings — short page headings are split into letter
+// spans that rise out of the heading's clipped line box one at a time
+// once the scroll-reveal marks their section in-view.
+(function () {
+  function setup() {
+    var headings = document.querySelectorAll('.section-head h2, .contact-box h2, .about-text h2');
+    headings.forEach(function (h) {
+      var text = h.textContent;
+      h.textContent = '';
+      h.classList.add('ch-split');
+      var ci = 0;
+      text.split('').forEach(function (chChar) {
+        if (chChar === ' ') {
+          h.appendChild(document.createTextNode(' '));
+          return;
+        }
+        var span = document.createElement('span');
+        span.className = 'ch';
+        span.style.setProperty('--ci', ci++);
+        span.textContent = chChar;
+        h.appendChild(span);
+      });
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setup);
+  } else {
+    setup();
+  }
+})();
+
+// 3D tilt — work-card thumbs lean toward the cursor like little
+// physical tiles, springing flat again on leave. Desktop only.
+(function () {
+  if (window.matchMedia('(hover: none), (pointer: coarse)').matches) return;
+
+  function setup() {
+    document.querySelectorAll('.card').forEach(function (card) {
+      var thumb = card.querySelector('.thumb');
+      if (!thumb) return;
+      card.addEventListener('mousemove', function (e) {
+        var r = thumb.getBoundingClientRect();
+        if (!r.width || !r.height) return;
+        var px = (e.clientX - r.left) / r.width - 0.5;
+        var py = (e.clientY - r.top) / r.height - 0.5;
+        thumb.style.transition = 'transform 0.12s ease-out';
+        thumb.style.transform =
+          'perspective(700px) rotateX(' + (-py * 6).toFixed(2) + 'deg) rotateY(' + (px * 6).toFixed(2) + 'deg)';
+      });
+      card.addEventListener('mouseleave', function () {
+        thumb.style.transition = 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+        thumb.style.transform = 'perspective(700px) rotateX(0deg) rotateY(0deg)';
+      });
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setup);
+  } else {
+    setup();
+  }
+})();
+
+// Click burst — every click anywhere pops a little cloud of particles
+// from the ambient background system, on every page.
+(function () {
+  window.addEventListener('click', function (e) {
+    var burst = window.__particleBurst;
+    if (typeof burst !== 'function') return;
+    var cx = e.clientX;
+    var cy = e.clientY;
+    for (var i = 0; i < 6; i++) {
+      setTimeout(function () {
+        burst(cx + (Math.random() - 0.5) * 40, cy + (Math.random() - 0.5) * 40);
+      }, i * 30);
+    }
+  });
+})();
+
+// Logo scramble — hovering the wordmark shuffles it through glitchy
+// glyphs that resolve left-to-right back into the real letters.
+(function () {
+  var logo = document.querySelector('.logo');
+  if (!logo) return;
+  var original = logo.innerHTML;
+  var text = logo.textContent;
+  var glyphs = '█▓▒░<>/*+#@%&';
+  var timer = null;
+
+  logo.addEventListener('mouseenter', function () {
+    var frame = 0;
+    var total = 12;
+    clearInterval(timer);
+    timer = setInterval(function () {
+      frame++;
+      if (frame >= total) {
+        clearInterval(timer);
+        logo.innerHTML = original;
+        return;
+      }
+      var out = '';
+      for (var i = 0; i < text.length; i++) {
+        out +=
+          i < (frame * text.length) / total
+            ? text[i]
+            : glyphs[Math.floor(Math.random() * glyphs.length)];
+      }
+      logo.textContent = out;
+    }, 40);
+  });
 })();
 
 // Footer meta bar — live Seoul clock and smooth back-to-top.
