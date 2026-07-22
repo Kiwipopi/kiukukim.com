@@ -1394,6 +1394,227 @@
   }
 })();
 
+// Lightbox — clicking a work card opens it big on a dark stage with
+// prev/next navigation (keyboard arrows, Esc, swipe). Inline cards
+// keep their hover preview but lose native controls; the lightbox is
+// the full viewing experience now.
+(function () {
+  function setup() {
+    var thumbs = document.querySelectorAll('.grid .card .thumb');
+    if (!thumbs.length) return;
+
+    document.querySelectorAll('.card video').forEach(function (v) {
+      v.removeAttribute('controls');
+    });
+
+    var lb = document.createElement('div');
+    lb.className = 'lightbox';
+    lb.hidden = true;
+    lb.innerHTML =
+      '<div class="lightbox-backdrop"></div>' +
+      '<figure class="lightbox-stage">' +
+      '<div class="lightbox-media"></div>' +
+      '<figcaption class="lightbox-info">' +
+      '<div class="lightbox-cap"></div>' +
+      '<div class="lightbox-meta"></div>' +
+      '</figcaption>' +
+      '</figure>' +
+      '<div class="lightbox-count" aria-hidden="true"></div>' +
+      '<button class="lightbox-close" type="button" aria-label="Close">&times;</button>' +
+      '<button class="lightbox-prev" type="button" aria-label="Previous work">&larr;</button>' +
+      '<button class="lightbox-next" type="button" aria-label="Next work">&rarr;</button>';
+    document.body.appendChild(lb);
+
+    var mediaWrap = lb.querySelector('.lightbox-media');
+    var capEl = lb.querySelector('.lightbox-cap');
+    var metaEl = lb.querySelector('.lightbox-meta');
+    var countEl = lb.querySelector('.lightbox-count');
+    var cards = [];
+    var idx = 0;
+    var hideTimer = null;
+
+    function pad(n) {
+      var s = String(n);
+      while (s.length < 2) s = '0' + s;
+      return s;
+    }
+
+    function activeCards() {
+      var panel = document.querySelector('.panel.active');
+      var scope = panel || document;
+      return Array.prototype.slice.call(scope.querySelectorAll('.card'));
+    }
+
+    function show(i) {
+      if (!cards.length) return;
+      idx = ((i % cards.length) + cards.length) % cards.length;
+      var card = cards[idx];
+      var srcVideo = card.querySelector('video');
+      mediaWrap.innerHTML = '';
+
+      if (srcVideo) {
+        var srcEl = srcVideo.querySelector('source');
+        var v = document.createElement('video');
+        v.src = srcEl ? srcEl.src : srcVideo.currentSrc;
+        v.poster = srcVideo.getAttribute('poster') || '';
+        v.controls = true;
+        v.loop = true;
+        v.playsInline = true;
+        mediaWrap.appendChild(v);
+        var p = v.play();
+        if (p && p.catch) {
+          p.catch(function () {
+            v.muted = true;
+            v.play().catch(function () {});
+          });
+        }
+      } else {
+        var srcImg = card.querySelector('.thumb img');
+        if (srcImg) {
+          var im = document.createElement('img');
+          im.src = srcImg.src;
+          im.alt = '';
+          mediaWrap.appendChild(im);
+        }
+      }
+
+      var cap = card.querySelector('.cap');
+      capEl.textContent = cap ? cap.textContent : '';
+
+      var bits = [];
+      card.querySelectorAll('.tags span').forEach(function (t) { bits.push(t.textContent); });
+      card.querySelectorAll('.meta span').forEach(function (m) { bits.push(m.textContent); });
+      metaEl.textContent = bits.join(' · ');
+
+      countEl.textContent = pad(idx + 1) + ' / ' + pad(cards.length);
+    }
+
+    function open(card) {
+      cards = activeCards();
+      var i = cards.indexOf(card);
+      if (i < 0) return;
+      document.querySelectorAll('.card video').forEach(function (v) { v.pause(); });
+      clearTimeout(hideTimer);
+      lb.hidden = false;
+      requestAnimationFrame(function () { lb.classList.add('lightbox--open'); });
+      document.documentElement.classList.add('lightbox-lock');
+      show(i);
+    }
+
+    function close() {
+      lb.classList.remove('lightbox--open');
+      document.documentElement.classList.remove('lightbox-lock');
+      mediaWrap.innerHTML = '';
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(function () { lb.hidden = true; }, 320);
+    }
+
+    thumbs.forEach(function (t) {
+      t.addEventListener('click', function (e) {
+        e.preventDefault();
+        var card = t.closest('.card');
+        if (card) open(card);
+      });
+    });
+
+    lb.querySelector('.lightbox-close').addEventListener('click', close);
+    lb.querySelector('.lightbox-backdrop').addEventListener('click', close);
+    lb.querySelector('.lightbox-prev').addEventListener('click', function () { show(idx - 1); });
+    lb.querySelector('.lightbox-next').addEventListener('click', function () { show(idx + 1); });
+
+    document.addEventListener('keydown', function (e) {
+      if (lb.hidden) return;
+      if (e.key === 'Escape') close();
+      else if (e.key === 'ArrowLeft') show(idx - 1);
+      else if (e.key === 'ArrowRight') show(idx + 1);
+    });
+
+    var touchX = null;
+    lb.addEventListener('touchstart', function (e) {
+      touchX = e.touches[0].clientX;
+    }, { passive: true });
+    lb.addEventListener('touchend', function (e) {
+      if (touchX === null) return;
+      var dx = e.changedTouches[0].clientX - touchX;
+      if (Math.abs(dx) > 48) {
+        if (dx > 0) show(idx - 1);
+        else show(idx + 1);
+      }
+      touchX = null;
+    }, { passive: true });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setup);
+  } else {
+    setup();
+  }
+})();
+
+// Scroll-scrubbed statement text — the interlude lines are split into
+// word spans that ink in one by one, tied to how far each scene has
+// scrolled into the viewport, so the line reads itself in on the way.
+(function () {
+  function setup() {
+    var texts = document.querySelectorAll('.interlude-text');
+    if (!texts.length) return;
+
+    var groups = [];
+    texts.forEach(function (p) {
+      var scene = p.closest('.interlude');
+      if (!scene) return;
+      var words = [];
+      Array.prototype.slice.call(p.childNodes).forEach(function (node) {
+        if (node.nodeType !== 3) return; // keep <br> etc. in place
+        var frag = document.createDocumentFragment();
+        node.textContent.split(/(\s+)/).forEach(function (part) {
+          if (!part) return;
+          if (/^\s+$/.test(part)) {
+            frag.appendChild(document.createTextNode(' '));
+            return;
+          }
+          var s = document.createElement('span');
+          s.className = 'w';
+          s.textContent = part;
+          frag.appendChild(s);
+          words.push(s);
+        });
+        p.replaceChild(frag, node);
+      });
+      if (words.length) groups.push({ scene: scene, words: words });
+    });
+    if (!groups.length) return;
+
+    var ticking = false;
+    function update() {
+      ticking = false;
+      var vh = window.innerHeight;
+      groups.forEach(function (g) {
+        var r = g.scene.getBoundingClientRect();
+        var p = (vh - r.top) / (vh * 0.9);
+        p = Math.max(0, Math.min(1, p));
+        var on = Math.round(p * g.words.length);
+        g.words.forEach(function (w, i) {
+          w.classList.toggle('w-on', i < on);
+        });
+      });
+    }
+    function onScroll() {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    update();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setup);
+  } else {
+    setup();
+  }
+})();
+
 // Scroll cue — the fixed "Scroll" hint in the corner bows out as soon
 // as the visitor actually starts scrolling, returning at the very top.
 (function () {
