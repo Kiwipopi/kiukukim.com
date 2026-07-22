@@ -37,6 +37,7 @@
     <div class="tabs">
       <button class="tab-btn active" data-panel="particles">Particles</button>
       <button class="tab-btn" data-panel="shojo">少女 Series</button>
+      <button class="tab-btn" data-panel="water">Water</button>
       <button class="tab-btn" data-panel="exhibition">Exhibition</button>
     </div>
 
@@ -438,6 +439,23 @@
 
     </div>
 
+    <div class="grid panel" id="panel-water" data-count="1" data-label="Water">
+
+      <div class="card video-card">
+        <div class="thumb ratio-9x16">
+          <video poster="images/wave-return.jpg" controls preload="metadata" playsinline>
+            <source src="videos/wave-return.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div class="card-body">
+          <div class="cap">Wave Return</div>
+          <div class="tags"><span>#houdini</span><span>#water</span></div>
+          <div class="meta"><span>1080×1920</span><div class="metrics"><span>0:30</span></div></div>
+        </div>
+      </div>
+
+    </div>
+
     <div class="panel" id="panel-exhibition" data-count="10" data-label="Exhibition">
 
       <div class="exhibition-group">
@@ -629,6 +647,7 @@
   var panels = {
     particles: document.getElementById('panel-particles'),
     shojo: document.getElementById('panel-shojo'),
+    water: document.getElementById('panel-water'),
     exhibition: document.getElementById('panel-exhibition'),
   };
   var countLabel = document.getElementById('panel-count');

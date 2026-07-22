@@ -1782,6 +1782,13 @@ html.lightbox-lock body {
   transition: opacity 0.3s ease;
 }
 
+/* the explicit display:flex above would silently override the UA's
+   [hidden] rule, leaving an invisible full-screen overlay that eats
+   every click — restate it so hidden actually hides */
+.lightbox[hidden] {
+  display: none;
+}
+
 .lightbox--open {
   opacity: 1;
 }
