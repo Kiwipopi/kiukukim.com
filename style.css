@@ -250,6 +250,91 @@ html.intro-lock, html.intro-lock body { overflow: hidden; height: 100%; }
   pointer-events: none;
 }
 
+/* live-typed VEX panel on the splash's left edge — the intro reads as
+   the site compiling itself, nintendo-systems style */
+.intro-code {
+  position: absolute;
+  left: 28px;
+  top: 28px;
+  bottom: 28px;
+  z-index: 0;
+  width: min(38vw, 420px);
+  overflow: hidden;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 11px;
+  line-height: 1.75;
+  color: rgba(10, 10, 10, 0.4);
+  pointer-events: none;
+}
+
+.intro-code pre {
+  display: inline;
+  font: inherit;
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin: 0;
+}
+
+.intro-caret {
+  display: inline-block;
+  width: 7px;
+  height: 13px;
+  margin-left: 1px;
+  vertical-align: -2px;
+  background: rgba(10, 10, 10, 0.55);
+  animation: caret-blink 0.85s steps(1) infinite;
+}
+
+@keyframes caret-blink {
+  50% { opacity: 0; }
+}
+
+/* the wordmark's initial rendered out of binary digits on the right,
+   fading in while the particles converge */
+.intro-binary {
+  position: absolute;
+  right: 3vw;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 0;
+  margin: 0;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 11px;
+  line-height: 11px;
+  letter-spacing: 1px;
+  white-space: pre;
+  color: rgba(10, 10, 10, 0.24);
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  pointer-events: none;
+}
+
+.intro-splash.intro-binary-visible .intro-binary {
+  opacity: 1;
+}
+
+/* boot log above the percentage counter — one-line status messages
+   ticking off each phase of the assembly */
+.intro-log {
+  position: absolute;
+  left: 28px;
+  bottom: 52px;
+  z-index: 1;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 10px;
+  line-height: 1.9;
+  letter-spacing: 0.04em;
+  color: rgba(10, 10, 10, 0.45);
+  pointer-events: none;
+}
+
+@media (max-width: 720px) {
+  .intro-code,
+  .intro-binary {
+    display: none;
+  }
+}
+
 /* thin scroll-progress line pinned to the very top of the viewport,
    present on every page (injected by JS). Sits just behind the intro
    splash so it never flashes on top of it before the reveal. */

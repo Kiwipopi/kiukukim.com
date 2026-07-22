@@ -11,7 +11,50 @@
   var canvas = splash.querySelector('canvas');
   var ctx = canvas && canvas.getContext('2d');
   var counter = splash.querySelector('.intro-counter');
+  var codePre = splash.querySelector('.intro-code pre');
+  var logEl = splash.querySelector('.intro-log');
   document.documentElement.classList.add('intro-lock');
+
+  // the VEX-flavored source that "compiles" the intro, typed out live
+  // on the splash's left edge with line numbers, boot-sequence style
+  var CODE_SRC = [
+    '/**',
+    ' * kiukukim — particle portfolio',
+    ' * (c) 2026 WOOK. all flows reserved.',
+    ' * https://kiukukim.com/',
+    ' */',
+    'float freq = chf("frequency");',
+    'vector pos = @P * freq;',
+    'vector n = curlnoise(pos + @Time * chf("speed"));',
+    '@accel += n * chf("strength");',
+    'v@v += @accel * @TimeInc;',
+    '@P += @v * @TimeInc;',
+    'float age = @age / @life;',
+    '@Cd = chramp("color_ramp", age);',
+    '@pscale = fit(age, 0, 1, chf("size_start"), chf("size_end"));',
+    'if (@age > @life) removepoint(0, @ptnum);',
+    '// assemble — glyph targets',
+    'int pts[] = nearpoints(0, @P, chf("radius"), 8);',
+    'foreach (int pt; pts) {',
+    '    vector d = @P - point(0, "P", pt);',
+    '    @force += normalize(d) / max(length(d), 0.01);',
+    '}',
+    '@P += @force * chf("cohesion") * @TimeInc;',
+    '// kiukukim :: wordmark ready',
+  ].map(function (line, i) {
+    var n = String(i + 1);
+    while (n.length < 2) n = '0' + n;
+    return n + '. ' + line;
+  }).join('\n');
+
+  var loggedPhases = {};
+  function bootLog(key, text) {
+    if (!logEl || loggedPhases[key]) return;
+    loggedPhases[key] = true;
+    var row = document.createElement('div');
+    row.textContent = '> ' + text;
+    logEl.appendChild(row);
+  }
 
   function finishInstantly() {
     splash.classList.add('intro-mark-visible', 'intro-done');
@@ -23,6 +66,39 @@
 
   var w = (canvas.width = window.innerWidth);
   var h = (canvas.height = window.innerHeight);
+
+  // a giant K rendered out of binary digits on the right while the
+  // particles converge — the wordmark's "source form"
+  (function buildBinaryGlyph() {
+    var bin = splash.querySelector('.intro-binary');
+    if (!bin) return;
+    var cols = 46;
+    var rows = 40;
+    var off = document.createElement('canvas');
+    off.width = cols;
+    off.height = rows;
+    var octx = off.getContext('2d');
+    if (!octx) return;
+    octx.fillStyle = '#000';
+    octx.font = '800 ' + rows * 1.16 + 'px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    octx.textAlign = 'center';
+    octx.textBaseline = 'middle';
+    // stretch horizontally so the glyph stays square once each canvas
+    // pixel becomes a (taller-than-wide) monospace character cell
+    octx.setTransform(1.45, 0, 0, 1, 0, 0);
+    octx.fillText('K', cols / 2 / 1.45, rows * 0.56);
+    var data = octx.getImageData(0, 0, cols, rows).data;
+    var out = '';
+    for (var y = 0; y < rows; y++) {
+      for (var x = 0; x < cols; x++) {
+        out += data[(y * cols + x) * 4 + 3] > 100 ? (Math.random() < 0.5 ? '0' : '1') : ' ';
+      }
+      out += '\n';
+    }
+    bin.textContent = out;
+  })();
+
+  bootLog('boot', 'boot kiukukim.sys');
 
   // sample points from inside the wordmark's own glyph shapes (drawn
   // off-screen) so particles assemble into the real letterforms
@@ -98,6 +174,7 @@
     if (!ringsShown) {
       ringsShown = true;
       splash.classList.add('intro-rings-visible');
+      bootLog('init', 'initializing particles… ok');
     }
 
     // preloader-style percentage — reaches 100 right as the crisp
@@ -107,6 +184,17 @@
       var s = String(pct);
       while (s.length < 3) s = '0' + s;
       counter.textContent = s + '%';
+    }
+
+    // the VEX source types itself out at a steady clip alongside
+    if (codePre) {
+      var typed = Math.min(CODE_SRC.length, Math.floor(elapsed * 0.22));
+      codePre.textContent = CODE_SRC.substring(0, typed);
+    }
+
+    if (elapsed >= PRELUDE_MS) {
+      splash.classList.add('intro-binary-visible');
+      bootLog('converge', 'solving flow field…');
     }
 
     if (elapsed < PRELUDE_MS) {
@@ -162,6 +250,7 @@
         markShown = true;
         markShownAt = now;
         splash.classList.add('intro-mark-visible');
+        bootLog('mark', 'assembling wordmark… ok');
       }
       var fadeOut = clamp01((now - markShownAt) / HOLD_FADE_MS);
       var pAlpha = 1 - ease(fadeOut);
@@ -192,6 +281,7 @@
         done = true;
         splash.classList.add('intro-done');
         document.documentElement.classList.remove('intro-lock');
+        bootLog('launch', 'launch.');
         setTimeout(function () { splash.remove(); }, BURST_MS);
       }
       ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
