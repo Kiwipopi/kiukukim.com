@@ -1164,15 +1164,14 @@ section { padding: 110px 0; }
   margin: 0 auto;
 }
 
-/* portrait cards stay three to a row even on phones, rather than
-   dropping to 2 or 1 wide — just with a tighter gap so they still
-   have room to breathe */
+/* on phones the grid drops to a single column so each portrait work
+   fills the screen and is viewed one at a time, feed-style */
 @media (max-width: 620px) {
-  .grid { gap: 10px; }
-}
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
 
-@media (max-width: 440px) {
-  .grid { gap: 6px; }
   .card.wide .thumb { max-width: none; }
 }
 
