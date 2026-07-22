@@ -1523,6 +1523,23 @@
     var idx = 0;
     var hideTimer = null;
 
+    // the inline card's own <video> element is MOVED into the lightbox
+    // (not copied) so whatever it has already buffered comes with it —
+    // these are big files, downloading them twice hurts
+    var movedVideo = null;
+    var movedHome = null;
+
+    function restoreMoved() {
+      if (movedVideo && movedHome) {
+        movedVideo.pause();
+        movedVideo.controls = false;
+        movedHome.insertBefore(movedVideo, movedHome.firstChild);
+      }
+      movedVideo = null;
+      movedHome = null;
+      lb.classList.remove('lightbox-loading');
+    }
+
     function pad(n) {
       var s = String(n);
       while (s.length < 2) s = '0' + s;
@@ -1537,25 +1554,36 @@
 
     function show(i) {
       if (!cards.length) return;
+      restoreMoved();
       idx = ((i % cards.length) + cards.length) % cards.length;
       var card = cards[idx];
       var srcVideo = card.querySelector('video');
       mediaWrap.innerHTML = '';
 
       if (srcVideo) {
-        var srcEl = srcVideo.querySelector('source');
-        var v = document.createElement('video');
-        v.src = srcEl ? srcEl.src : srcVideo.currentSrc;
-        v.poster = srcVideo.getAttribute('poster') || '';
-        v.controls = true;
-        v.loop = true;
-        v.playsInline = true;
-        mediaWrap.appendChild(v);
-        var p = v.play();
+        movedVideo = srcVideo;
+        movedHome = srcVideo.parentElement;
+        srcVideo.controls = true;
+        srcVideo.loop = true;
+        srcVideo.playsInline = true;
+        mediaWrap.appendChild(srcVideo);
+
+        // spinner until actual frames are ready to show
+        if (srcVideo.readyState < 3) {
+          lb.classList.add('lightbox-loading');
+          var clearLoading = function () {
+            lb.classList.remove('lightbox-loading');
+          };
+          srcVideo.addEventListener('canplay', clearLoading, { once: true });
+          srcVideo.addEventListener('playing', clearLoading, { once: true });
+        }
+
+        srcVideo.muted = false;
+        var p = srcVideo.play();
         if (p && p.catch) {
           p.catch(function () {
-            v.muted = true;
-            v.play().catch(function () {});
+            srcVideo.muted = true;
+            srcVideo.play().catch(function () {});
           });
         }
       } else {
@@ -1594,6 +1622,7 @@
     function close() {
       lb.classList.remove('lightbox--open');
       document.documentElement.classList.remove('lightbox-lock');
+      restoreMoved();
       mediaWrap.innerHTML = '';
       clearTimeout(hideTimer);
       hideTimer = setTimeout(function () { lb.hidden = true; }, 320);
