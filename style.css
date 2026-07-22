@@ -401,13 +401,25 @@ header.nav {
 
 nav.links {
   display: flex;
-  gap: 28px;
+  gap: 22px;
   align-items: center;
 }
 
+/* code-syntax chrome around the nav — the menu reads as
+   { Home // Works // About // Contact }, echoing the VEX code texture
+   behind the pages. Separator spans are injected by JS. */
+.nav-sep {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.78rem;
+  color: rgba(0, 0, 0, 0.28);
+  user-select: none;
+  pointer-events: none;
+}
+
 nav.links a {
-  font-size: 0.8rem;
-  letter-spacing: 0.03em;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.01em;
   color: var(--muted);
   transition: color 0.2s ease;
   position: relative;
@@ -1619,6 +1631,43 @@ footer {
   to { transform: translateY(14px); }
 }
 
+/* ASCII-art scene — a work image re-rendered as monospace characters,
+   the piece literally rebuilt out of code glyphs */
+.ascii-scene .ascii-wrap {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ascii-scene.in-view .ascii-wrap {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.ascii-art {
+  display: inline-block;
+  margin-top: 20px;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 7px;
+  line-height: 7px;
+  letter-spacing: 0;
+  white-space: pre;
+  text-align: left;
+  color: rgba(10, 10, 10, 0.82);
+  user-select: none;
+}
+
+.ascii-cap {
+  margin-top: 16px;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
 /* quiet fixed scroll cue in the corner — a small vertical label with a
    line that keeps drawing itself downward; fades once scrolling starts */
 .scroll-hint {
@@ -1716,10 +1765,19 @@ footer {
 }
 
 .footer-clock {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
   font-size: 0.72rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-variant-numeric: tabular-nums;
+}
+
+/* copyright written as a code comment, same voice as the VEX texture */
+.code-comment {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.72rem;
+  font-style: italic;
+  color: var(--muted);
 }
 
 .to-top {
@@ -1747,6 +1805,11 @@ footer {
   .hero-side { display: none; }
   .float-cube { display: none; }
   .scroll-hint { display: none; }
+
+  /* nav braces/slashes don't fit the pill-button mobile nav; shrink
+     the ASCII art so its fixed column count fits a phone screen */
+  .nav-sep { display: none; }
+  .ascii-art { font-size: 3.4px; line-height: 3.4px; }
 
   .about-grid { grid-template-columns: 1fr; }
   .avatar-wrap { max-width: 220px; margin: 0 auto; }

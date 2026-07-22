@@ -1316,6 +1316,84 @@
   });
 })();
 
+// Code-syntax nav — wraps the menu in braces and separates links with
+// // so it reads as { Home // Works // About // Contact }, matching
+// the VEX code texture behind the pages.
+(function () {
+  function setup() {
+    var nav = document.querySelector('nav.links');
+    if (!nav) return;
+    var links = nav.querySelectorAll('a');
+    if (!links.length) return;
+
+    function sep(text) {
+      var s = document.createElement('span');
+      s.className = 'nav-sep';
+      s.setAttribute('aria-hidden', 'true');
+      s.textContent = text;
+      return s;
+    }
+
+    nav.insertBefore(sep('{'), links[0]);
+    for (var i = 1; i < links.length; i++) {
+      nav.insertBefore(sep('//'), links[i]);
+    }
+    nav.appendChild(sep('}'));
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setup);
+  } else {
+    setup();
+  }
+})();
+
+// ASCII renderer — redraws a work image as monospace characters inside
+// a <pre>, mapping pixel luminance to glyph density.
+(function () {
+  function render(pre) {
+    var img = new Image();
+    img.onload = function () {
+      var RAMP = '@#W$%*+=~-:. ';
+      var cols = 110;
+      // monospace glyph cells are roughly twice as tall as they are
+      // wide, so sample half as many rows to keep the image's aspect
+      var rows = Math.max(1, Math.round(cols * (img.height / img.width) * 0.5));
+      var cv = document.createElement('canvas');
+      cv.width = cols;
+      cv.height = rows;
+      var c = cv.getContext('2d');
+      if (!c) return;
+      c.drawImage(img, 0, 0, cols, rows);
+      var data;
+      try {
+        data = c.getImageData(0, 0, cols, rows).data;
+      } catch (e) {
+        return;
+      }
+      var out = '';
+      for (var y = 0; y < rows; y++) {
+        for (var x = 0; x < cols; x++) {
+          var i = (y * cols + x) * 4;
+          var lum = (data[i] * 0.2126 + data[i + 1] * 0.7152 + data[i + 2] * 0.0722) / 255;
+          out += RAMP[Math.round(lum * (RAMP.length - 1))];
+        }
+        out += '\n';
+      }
+      pre.textContent = out;
+    };
+    img.src = pre.getAttribute('data-ascii-src');
+  }
+
+  function setup() {
+    document.querySelectorAll('pre.ascii-art[data-ascii-src]').forEach(render);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setup);
+  } else {
+    setup();
+  }
+})();
+
 // Scroll cue — the fixed "Scroll" hint in the corner bows out as soon
 // as the visitor actually starts scrolling, returning at the very top.
 (function () {
