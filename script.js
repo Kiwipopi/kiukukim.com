@@ -409,8 +409,14 @@
   resize();
 
   function loop() {
-    phase += 0.0017;
-    draw();
+    // freeze the backdrop while a gallery video is playing — the 4k
+    // stroked line segments and blurred dots drawn here every frame
+    // compete with video decoding for the same frame budget and cause
+    // visible playback stutter
+    if (!document.documentElement.classList.contains('video-playing')) {
+      phase += 0.0017;
+      draw();
+    }
     requestAnimationFrame(loop);
   }
   requestAnimationFrame(loop);
@@ -468,6 +474,12 @@
   }
 
   function step() {
+    // freeze while a gallery video is playing, same as the flow field
+    // (this loop's O(n²) neighbor-line pass is the other big burner)
+    if (document.documentElement.classList.contains('video-playing')) {
+      requestAnimationFrame(step);
+      return;
+    }
     ctx.clearRect(0, 0, w, h);
     for (const p of particles) {
       // drift
@@ -881,6 +893,9 @@
         var card = current.closest('.card');
         if (card) card.classList.add('is-playing');
       }
+      // ambient canvas loops watch this flag and freeze while any
+      // gallery video is playing, freeing the frame budget for decode
+      document.documentElement.classList.toggle('video-playing', !!current);
     }
 
     videos.forEach(function (v) {
@@ -890,6 +905,7 @@
           current = null;
           var card = v.closest('.card');
           if (card) card.classList.remove('is-playing');
+          document.documentElement.classList.remove('video-playing');
         }
       });
     });
@@ -1336,6 +1352,9 @@
       var thumb = card.querySelector('.thumb');
       if (!thumb) return;
       card.addEventListener('mousemove', function (e) {
+        // constantly re-tilting a card whose video is playing forces
+        // re-compositing of the decoding video — skip it there
+        if (card.classList.contains('is-playing')) return;
         var r = thumb.getBoundingClientRect();
         if (!r.width || !r.height) return;
         var px = (e.clientX - r.left) / r.width - 0.5;
